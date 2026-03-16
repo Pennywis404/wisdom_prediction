@@ -23,6 +23,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# Data (generated, can be large)
+data/
+
 # Claude
 .claude/
 CLAUDE.md

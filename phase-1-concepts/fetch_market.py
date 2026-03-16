@@ -17,17 +17,32 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 GAMMA_API = "https://gamma-api.polymarket.com"
 
 MACRO_KEYWORDS = [
-    "fed", "fomc", "interest rate", "rate cut", "rate hike",
-    "cpi", "inflation",
-    "nfp", "jobs", "unemployment", "payroll",
-    "election", "president", "congress", "senate",
-    "gdp", "recession",
-    "tariff", "trade war", "sanctions",
-    "trump", "biden",
-    "war", "nato", "china", "russia", "iran",
-    "debt ceiling", "government shutdown",
-    "oil", "opec",
+    # Monetary policy
+    "fed ", "fomc", "interest rate", "rate cut", "rate hike", "federal reserve",
+    # Economic indicators
+    "cpi", "inflation", "nfp", "unemployment rate", "payroll", "gdp", "recession",
+    # Fiscal / trade policy
+    "tariff", "trade war", "sanctions", "debt ceiling", "government shutdown",
+    # Geopolitics with market impact
+    "war ", "opec", "oil price",
+    # Stocks & indices
+    "s&p", "sp500", "nasdaq", "dow jones", "stock price", "stock market",
+    "ipo", "market cap", "all-time high", "all time high",
+    # Companies / tech
+    "tesla", "apple", "nvidia", "google", "amazon", "microsoft", "meta ",
+    "openai", "spacex",
+    # Crypto
+    "bitcoin", "btc", "ethereum", "eth ", "crypto", "solana",
+    # Commodities & assets
+    "gold", "silver", "oil ", "natural gas", "commodity",
+    # Prices & financial
+    "price above", "price below", "price of", "reach $", "above $", "below $",
+    "market crash", "bear market", "bull market",
+    # Real estate & misc assets
+    "housing", "real estate", "home price",
 ]
+
+MAX_DISPLAY = 30  # Cap output to avoid flooding the terminal
 
 # ---------------------------------------------------------------------------
 # API fetch with retry
@@ -35,9 +50,18 @@ MACRO_KEYWORDS = [
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def fetch_active_events(limit=50, offset=0):
-    """Fetch active events from the Gamma API with exponential backoff."""
+    """Fetch active, non-closed events sorted by volume (descending)."""
     url = f"{GAMMA_API}/events"
-    params = {"active": "true", "limit": limit, "offset": offset}
+    params = {
+        "active": "true",
+        "closed": "false",
+        "archived": "false",
+        "order": "volume",
+        "ascending": "false",
+        "liquidity_min": 1000,
+        "limit": limit,
+        "offset": offset,
+    }
     resp = requests.get(url, params=params, timeout=15)
     resp.raise_for_status()
     return resp.json()
@@ -102,9 +126,17 @@ def format_market(market):
     price_parts = [f"{o}: ${p:.2f}" for o, p in zip(outcomes, prices)]
     price_str = " | ".join(price_parts)
 
-    volume = market.get("volume", "N/A")
-    if isinstance(volume, (int, float)):
-        volume = f"${volume:,.0f}"
+    volume = market.get("volume", "0")
+    try:
+        volume = f"${float(volume):,.0f}"
+    except (ValueError, TypeError):
+        volume = "N/A"
+
+    liquidity = market.get("liquidity", "0")
+    try:
+        liquidity = f"${float(liquidity):,.0f}"
+    except (ValueError, TypeError):
+        liquidity = "N/A"
 
     end_date = market.get("endDate", "N/A")
     if end_date and end_date != "N/A":
@@ -115,7 +147,7 @@ def format_market(market):
     return (
         f"  {market.get('question', 'Unknown')}\n"
         f"    {price_str}{invariant_flag}\n"
-        f"    Volume: {volume} | End: {end_date}\n"
+        f"    Volume: {volume} | Liquidity: {liquidity} | End: {end_date}\n"
         f"    Event: {market.get('_event_title', 'N/A')}"
     )
 
@@ -151,18 +183,20 @@ def main():
     print()
 
     # Filter macro markets
-    macro_markets = [m for m in markets if is_macro(m)]
+    financial_markets = [m for m in markets if is_macro(m)]
 
-    if macro_markets:
-        print(f"MACRO MARKETS FOUND: {len(macro_markets)}")
+    if financial_markets:
+        print(f"FINANCIAL / MACRO MARKETS FOUND: {len(financial_markets)}")
+        if len(financial_markets) > MAX_DISPLAY:
+            print(f"  (showing top {MAX_DISPLAY} by volume)")
         print("-" * 60)
-        for m in macro_markets:
+        for m in financial_markets[:MAX_DISPLAY]:
             formatted = format_market(m)
             if formatted:
                 print(formatted)
                 print()
     else:
-        print("No macro markets found with current keywords.")
+        print("No financial/macro markets found with current keywords.")
         print()
 
     # Fallback: show 5 sample markets regardless
