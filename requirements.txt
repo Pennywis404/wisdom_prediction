@@ -1,0 +1,12 @@
+requests
+pandas
+numpy
+tenacity
+python-dotenv
+matplotlib
+plotly
+yfinance
+statsmodels
+web3
+py-clob-client
+websockets
