@@ -10,3 +10,6 @@ statsmodels
 web3
 py-clob-client
 websockets
+google-cloud-bigquery
+db-dtypes
+pyarrow

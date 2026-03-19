@@ -9,7 +9,7 @@ Un marché de prédiction est un marché où les participants achètent et vende
 - **Argent réel** : chaque position coûte de l'argent → filtre les opinions faibles
 - **24/7** : contrairement aux marchés financiers, Polymarket ne dort jamais
 - **Granularité** : des marchés sur des événements très spécifiques (décision Fed, résultat CPI exact)
-- **Transparence** : toutes les transactions sont onchain sur Polygon
+- **Transparence** : toutes les transactions sont onchain sur Polygon (autrement dit elles sont accessibles sur la blockchain de Polygon)
 
 ## Les 3 APIs Polymarket
 
