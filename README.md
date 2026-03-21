@@ -50,7 +50,9 @@ cp .env.example .env
 ## Progression
 
 - [x] Phase 1 — Concepts et premier fetch
-- [ ] Phase 2 — Collecte de données marchés
+- [x] Phase 2 — Collecte de données (150K marchés, 14 tickers financiers, 418M trades sur BigQuery)
 - [ ] Phase 3 — Trading (auth L1/L2, ordres)
 - [ ] Phase 4 — Onchain (CTF, market making)
-- [ ] Phase 5 — Recherche (Granger, Brier, dashboard)
+- [x] Phase 5a — Preprocessing : classification des 538K marchés en 15 catégories via Gemini 2.0 Flash
+- [ ] Phase 5b — Analyse statistique (Granger, Brier, corrélations)
+- [ ] Phase 5c — Dashboard et visualisations
