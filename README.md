@@ -53,6 +53,6 @@ cp .env.example .env
 - [x] Phase 2 — Collecte de données (150K marchés, 14 tickers financiers, 418M trades sur BigQuery)
 - [ ] Phase 3 — Trading (auth L1/L2, ordres)
 - [ ] Phase 4 — Onchain (CTF, market making)
-- [x] Phase 5a — Preprocessing : classification des 538K marchés en 15 catégories via Gemini 2.0 Flash
+- [x] Phase 5a — Preprocessing : classification des 607K marchés en 15 catégories via regex Le (2026) — F1 macro 0.81
 - [ ] Phase 5b — Analyse statistique (Granger, Brier, corrélations)
 - [ ] Phase 5c — Dashboard et visualisations
